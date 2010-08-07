@@ -47,6 +47,7 @@ namespace fefe
 							string entries = strSource.Substring(0,pos);
 							
 							entries = entries.Replace("<li>", "\t");
+							entries = entries.Replace("<br>", Environment.NewLine);
 							entries = StripTags(entries);
 							Console.WriteLine(entries);
 						}
