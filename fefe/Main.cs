@@ -60,7 +60,7 @@ namespace fefe
 					
 				}		
 				
-				Console.ReadKey();
+				//Console.ReadKey();
 			} catch
 			{
 				Console.WriteLine("Sorry this is not working");	
