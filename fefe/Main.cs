@@ -1,3 +1,14 @@
+/* fefeclient - Main.cs 
+ * 
+ * Copyright (c) 2010 Hugo Scholz
+ * 
+ * This software may be used and redistributed under the terms of the Mozilla Public License 
+ * 
+ * See http://www.mozilla.org/MPL/MPL-1.1.html for details
+ */
+
+
+
 using System;
 using System.Net;
 using System.Text;
@@ -6,8 +17,41 @@ namespace fefe
 {
 	class MainClass
 	{
+		
+		private static bool filterBullshit = false;
+		
+			
+    	private static void PrintUsage()
+		{
+			Console.WriteLine("Usage: fefe.exe [-[f|h]]" + Environment.NewLine);
+			Console.WriteLine("Options:");
+			Console.Write    (" -f (filter bullshit):  Filters irrelevant blog posts using a scoring system ");
+			Console.WriteLine("based on complex AI algorithms and sophisticated heuristics");
+			Console.WriteLine(" -h (help)           :  Displays this text");
+		}
+		
 		public static void Main (string[] args)
 		{
+
+			
+			// Parse Command Line Args
+			if ( args.Length == 1)
+			{
+				if ( args[0] == "-f")
+				   filterBullshit = true;
+				else 
+				{
+					PrintUsage();
+					return;
+				}
+			}
+			else if ( args.Length > 1 )
+			{
+				PrintUsage();
+				return;
+			}
+	        		
+		
 			try
 			{
 				WebClient wClient = new WebClient();
@@ -20,6 +64,8 @@ namespace fefe
 				
 				bool found = true;
 				int counter = 0;
+				
+				Console.WriteLine();
 				
 				while(found)
 				{				
@@ -36,8 +82,8 @@ namespace fefe
 						string current = strSource.Substring(0, pos);
 						current = StripTags(current);
 						
-						//Write day
-						Console.WriteLine(current);
+						
+						
 						
 						{
 							pos = strSource.IndexOf("<ul>");
@@ -46,10 +92,39 @@ namespace fefe
 							pos = strSource.IndexOf("</ul>");
 							string entries = strSource.Substring(0,pos);
 							
-							entries = entries.Replace("<li>", "\t");
-							entries = entries.Replace("<br>", Environment.NewLine);
+							// entries = entries.Replace("<li>", "\t");
+							// entries = entries.Replace("<br>", Environment.NewLine);
+							
+							entries = entries.Replace("<li>", "");
+							entries = entries.Replace("<br>", "");
+
+							
 							entries = StripTags(entries);
-							Console.WriteLine(entries);
+							
+        					string[] delimiter = new string[]{"[l]"};
+							string[] blogPosts = entries.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
+								
+							// print blog posts to console
+							bool datePrinted = false;
+							for (int i = 1; i < blogPosts.Length; i++)
+							{
+							   // Check for bullshit blogpost, use heuristics
+						       bool isBullshit = ! (blogPosts[i].Contains("Wikipedia") || blogPosts[i].Contains("Zensuradmin") || blogPosts[i].Contains("Löschtroll"));
+							   if (! ( isBullshit && filterBullshit ) )
+							   {
+							      if ( ! datePrinted )
+							      {
+									 Console.WriteLine(current + Environment.NewLine);
+							         datePrinted = true;
+							      }    		 
+							  	  
+							  	  Console.WriteLine("\t[l]" + blogPosts[i]);		
+									
+							  }    
+							}
+									
+		
+							
 						}
 										
 						counter++;
@@ -65,6 +140,7 @@ namespace fefe
 			{
 				Console.WriteLine("Sorry this is not working");	
 			}
+
 		}
 		
 				
