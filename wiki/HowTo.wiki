@@ -23,3 +23,8 @@ Better support for longer texts!
 fefe.exe > out.txt
 }}}
 Writes the output into a file.
+
+{{{
+fefe.exe -f
+}}}
+Filters irrelevant content
