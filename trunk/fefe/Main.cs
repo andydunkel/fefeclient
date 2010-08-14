@@ -12,6 +12,7 @@
 using System;
 using System.Net;
 using System.Text;
+using System.Security.Cryptography.X509Certificates;
 
 namespace fefe
 {
@@ -54,10 +55,18 @@ namespace fefe
 		
 			try
 			{
+				ServicePointManager.ServerCertificateValidationCallback 
+					+= new System.Net.Security.RemoteCertificateValidationCallback(bypassAllCertificateStuff);
+				
+				
 				WebClient wClient = new WebClient();
+				wClient.Proxy =  WebRequest.DefaultWebProxy;
+				wClient.Proxy.Credentials = CredentialCache.DefaultCredentials;
+				wClient.UseDefaultCredentials = true;				
+				
 				wClient.Encoding = Encoding.UTF8;
 				wClient.Headers.Add("user-agent", "fefe.exe - command line client");
-				string strSource = wClient.DownloadString("http://blog.fefe.de");
+				string strSource = wClient.DownloadString("https://blog.fefe.de");
 			
 				string divOpen = "<h3>";
 				string divClose = "</h3>";
@@ -136,8 +145,9 @@ namespace fefe
 				}		
 				
 				//Console.ReadKey();
-			} catch
+			} catch (Exception ex)
 			{
+				Console.WriteLine(ex.Message);
 				Console.WriteLine("Sorry this is not working");	
 			}
 
@@ -168,6 +178,12 @@ namespace fefe
 	        }
 	        return new string(a, 0, ai);
     	}
+		
+		private static bool bypassAllCertificateStuff(object sender, X509Certificate cert, X509Chain chain, System.Net.Security.SslPolicyErrors error)
+		{
+   			return true;
+		}
+
 	}
 }
 
